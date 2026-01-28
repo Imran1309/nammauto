@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  /* Neon Brand Palette */
+  --app-primary: #00FF00;
+  /* Neon Green from logo outline */
+  --app-secondary: #FFD700;
+  /* Gold/Yellow from 'Auto' text */
+  --app-accent: #00CC00;
+  /* Darker Green */
+  --app-rose: #FFA500;
+  /* Orange accent */
+
+  --app-bg: #121212;
+  /* Deep Black/Grey */
+  --app-surface: #1E1E1E;
+  /* Slightly lighter surface */
+  --app-text: #FFFFFF;
+  /* White text */
+  --app-text-muted: #A0A0A0;
+
+  --font-display: 'Fredoka', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Gradients */
+.bg-vibrant-gradient {
+  background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-secondary) 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, var(--app-primary), var(--app-secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
