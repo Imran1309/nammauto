@@ -15,13 +15,13 @@ const Reviews = () => {
     <div className="pt-24 min-h-screen bg-[--app-bg] font-[--font-body]">
       <div className="max-w-7xl mx-auto px-6 mb-16">
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-[--font-display] font-bold mb-4 text-[--app-primary]">What people say</h1>
+          <h1 className="text-3xl md:text-5xl font-[--font-display] font-bold mb-4 text-[--app-primary]">What people say</h1>
           <p className="text-xl text-[--app-secondary]/80 font-medium">Trusted by thousands of riders and drivers</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {reviews.map((review, idx) => (
-            <div key={idx} className="p-8 rounded-3xl bg-[--app-surface] hover:bg-[--app-surface]/80 border border-[--app-primary]/10 hover:border-[--app-primary] hover:shadow-xl hover:shadow-[--app-primary]/10 transition-all hover:-translate-y-1">
+            <div key={idx} className="p-6 md:p-8 rounded-3xl bg-[--app-surface] hover:bg-[--app-surface]/80 border border-[--app-primary]/10 hover:border-[--app-primary] hover:shadow-xl hover:shadow-[--app-primary]/10 transition-all hover:-translate-y-1">
               <div className="flex gap-1 text-[--app-secondary] mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} size={20} fill={i < review.rating ? "currentColor" : "none"} className={i < review.rating ? "" : "text-[--app-primary]/20"} />

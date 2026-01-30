@@ -17,11 +17,11 @@ const Contact = () => {
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#00FF00] to-[gold]" />
         
         {/* Left Side: Info */}
-        <div className="p-12 relative overflow-hidden flex flex-col justify-between">
+        <div className="p-6 md:p-12 relative overflow-hidden flex flex-col justify-between">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[--app-primary]/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
           
           <div className="relative z-10">
-            <h1 className="text-5xl font-[--font-display] font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-[gold] to-[#FFA500]">Contact Us</h1>
+            <h1 className="text-4xl md:text-5xl font-[--font-display] font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-[gold] to-[#FFA500]">Contact Us</h1>
             <p className="text-gray-400 font-medium text-lg leading-relaxed mb-12">
               Have questions or feedback? We'd love to hear from you. Reach out to the NammAuto team.
             </p>
@@ -61,7 +61,7 @@ const Contact = () => {
         </div>
 
         {/* Right Side: Form */}
-        <div className="p-12 bg-[#0a0a0a]">
+        <div className="p-6 md:p-12 bg-[#0a0a0a]">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-bold text-gray-400 mb-2">Name</label>

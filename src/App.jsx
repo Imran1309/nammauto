@@ -38,7 +38,7 @@ const Layout = ({ children }) => {
 
 const ProtectedRoute = ({ children, role }) => {
   const { user } = useRadio();
-  if (!user) return <Navigate to="/login/user" />;
+  if (!user) return <Navigate to="/" />;
   if (role && user.role !== role) return <Navigate to="/" />;
   return children;
 };
@@ -55,7 +55,7 @@ const AppRoutes = () => {
       <Route path="/signup" element={<Signup />} />
       
       {/* Login Routes - reused LoginScreen but passed params if needed or internal state */}
-      <Route path="/login/:type?" element={user ? <Navigate to={`/dashboard/${user.role}`} /> : <LoginScreen />} />
+      <Route path="/login/:type?" element={user ? (user.role === 'driver' ? <Navigate to="/dashboard/driver" /> : <Navigate to="/" />) : <LoginScreen />} />
       
       {/* Protected Dashboards */}
       <Route path="/dashboard/user" element={

@@ -120,7 +120,7 @@ const UserDashboard = () => {
             className="w-full"
           >
             <div className="mb-8">
-              <h1 className="text-4xl font-[--font-display] font-bold text-gray-800 mb-2">Where to?</h1>
+              <h1 className="text-3xl md:text-4xl font-[--font-display] font-bold text-gray-800 mb-2">Where to?</h1>
               <div className="flex gap-2">
                  <span className="px-3 py-1 bg-white rounded-full text-xs font-bold text-gray-600 shadow-sm border">Home</span>
                  <span className="px-3 py-1 bg-white rounded-full text-xs font-bold text-gray-600 shadow-sm border">Work</span>

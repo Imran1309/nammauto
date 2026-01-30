@@ -3,15 +3,22 @@ import { useRadio } from '../context/RadioContext';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Star, Shield, Zap, Bike, Car, Bus, MapPin, Navigation } from 'lucide-react';
+import { toast } from 'sonner';
 
 const Home = () => {
-  const { user, requestRide } = useRadio();
+  const { user, requestRide, activeBooking, drivers, submitReview, cancelRide } = useRadio();
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const [selectedVehicle, setSelectedVehicle] = useState('Auto');
   const [carType, setCarType] = useState('Mini');
   const [pickup, setPickup] = useState('');
   const [drop, setDrop] = useState('');
+  const [showPhone, setShowPhone] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState('');
+
+  // Derive assigned driver
+  const assignedDriver = activeBooking?.driverId ? drivers.find(d => d.id === activeBooking.driverId) : null;
 
   const handleBookRide = () => {
     if (user) {
@@ -24,9 +31,31 @@ const Home = () => {
 
   const onBookNow = (e) => {
     e.preventDefault();
-    if (pickup && drop) {
-      requestRide(pickup, drop);
-    }
+    document.getElementById('ride-options')?.scrollIntoView({ behavior: 'smooth' });
+    toast.info("Select a trip type below to confirm booking");
+  };
+
+  const confirmBooking = (type) => {
+     if (!user) {
+        navigate('/login/user');
+        return;
+     }
+
+     let currentPickup = pickup;
+     let currentDrop = drop;
+
+     // Auto-fill locations if empty to ensure booking process completes for user convenience
+     if (!currentPickup) {
+        currentPickup = "Salem Old Bus Stand";
+        setPickup(currentPickup);
+     }
+     if (!currentDrop) {
+        currentDrop = "New Bus Stand";
+        setDrop(currentDrop);
+     }
+
+     const finalVehicle = selectedVehicle === 'Car' ? `Car (${carType})` : selectedVehicle;
+     requestRide(currentPickup, currentDrop, finalVehicle, type);
   };
 
   useEffect(() => {
@@ -71,70 +100,27 @@ const Home = () => {
             transition={{ duration: 0.8 }}
           >
            
-            <h1 className="text-6xl md:text-8xl font-[--font-display] font-bold text-[--app-primary] leading-tight mb-6">
-              
-              Ride <span className="text-[--app-secondary] inline-flex items-center gap-[1px] align-baseline">N<TyreSpinner />mmAut<TyreSpinner />.</span>
-            </h1>
-            <p className="text-xl text-[--app-primary]/70 mb-6 max-w-lg font-medium">
-              The fastest, safest, and most affordable way to travel. Connect with nearby auto drivers instantly. No bargaining, just riding.
-            </p>
+             <h1 className="text-5xl md:text-8xl font-[--font-display] font-bold text-[--app-primary] leading-tight mb-6">
+               
+               Ride <span className="text-[--app-secondary] inline-flex items-center gap-[1px] align-baseline">N<TyreSpinner />mmAut<TyreSpinner />.</span>
+             </h1>
+             <p className="text-lg md:text-xl text-[--app-primary]/70 mb-6 max-w-lg font-medium">
+               The fastest, safest, and most affordable way to travel. Connect with nearby auto drivers instantly. No bargaining, just riding.
+             </p>
+            
+            {!user && (
+              <button 
+                onClick={handleBookRide}
+                className="px-8 py-4 bg-black text-white font-[--font-display] font-bold text-xl rounded-full border border-[--app-primary] hover:bg-[--app-primary] hover:text-black transition-all shadow-[0_0_20px_rgba(0,255,0,0.3)] hover:shadow-[0_0_30px_rgba(0,255,0,0.5)] flex items-center gap-2 group mb-8"
+              >
+                Book Now
+                <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            )}
             
             
           
-            {/* Vehicle Selection - Moved into Hero */}
-            <div id="vehicle-selection" className="mt-8">
-              <div className="p-2 rounded-full bg-[#121212] border border-white/10 shadow-2xl inline-block w-full max-w-2xl">
-                 <div className="flex justify-between items-center bg-black/20 rounded-full p-1 overflow-x-auto">
-                     {['Bike', 'Auto', 'Car', 'Traveller'].map((vehicle) => (
-                         <button
-                             key={vehicle}
-                             onClick={() => {
-                               setSelectedVehicle(vehicle);
-                               document.getElementById('ride-options')?.scrollIntoView({ behavior: 'smooth' });
-                             }}
-                             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full transition-all duration-300 font-bold text-base whitespace-nowrap ${
-                                 selectedVehicle === vehicle
-                                 ? 'bg-[#FFD700] text-black shadow-lg scale-105'
-                                 : 'bg-transparent text-gray-500 hover:text-white hover:bg-white/5'
-                             }`}
-                         >
-                             {vehicle === 'Bike' && <Bike size={20} />}
-                             {vehicle === 'Auto' && <AutoRickshawIcon size={20} />} 
-                             {vehicle === 'Car' && <Car size={20} />}
-                             {vehicle === 'Traveller' && <Bus size={20} />}
-                             {vehicle}
-                         </button>
-                     ))}
-                 </div>
-              </div>
 
-               {/* Car Sub-selection */}
-               {selectedVehicle === 'Car' && (
-                 <motion.div 
-                   initial={{ opacity: 0, height: 0 }}
-                   animate={{ opacity: 1, height: 'auto' }}
-                   className="flex justify-start gap-4 mt-4 ml-4"
-                 >
-                    {['Mini-4', 'SUV-7'].map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => {
-                          setCarType(type);
-                          document.getElementById('ride-options')?.scrollIntoView({ behavior: 'smooth' });
-                        }}
-                        className={`px-6 py-2 rounded-full font-bold transition-all flex items-center gap-2 text-sm ${
-                          carType === type 
-                          ? 'bg-[#FFD700] text-black shadow-lg' 
-                          : 'bg-[#1a1a1a] text-gray-400 hover:text-white border border-white/10'
-                        }`}
-                      >
-                        <Car size={16} />
-                        {type}
-                      </button>
-                    ))}
-                 </motion.div>
-               )}
-            </div>
 
             {/* Quick Booking Form (Logged In) */}
             {user && (
@@ -145,66 +131,78 @@ const Home = () => {
                 className="mt-8 max-w-lg w-full"
               >
                   {/* Where To Header */}
-                  <div className="mb-6 text-center md:text-left">
-                    <h3 className="text-3xl font-[--font-display] font-bold text-white mb-3">Where to?</h3>
-                    <div className="flex gap-2 justify-center md:justify-start">
-                       <span className="px-4 py-1 bg-white rounded-full text-xs font-bold text-black shadow-sm cursor-pointer hover:bg-gray-200">Home</span>
-                       <span className="px-4 py-1 bg-white rounded-full text-xs font-bold text-black shadow-sm cursor-pointer hover:bg-gray-200">Work</span>
-                       <span className="px-4 py-1 bg-white rounded-full text-xs font-bold text-black shadow-sm cursor-pointer hover:bg-gray-200">Gym</span>
-                    </div>
-                  </div>
+
 
                   <div className="bg-[#121212] p-6 rounded-3xl border border-white/10 shadow-2xl">
-                    <form onSubmit={onBookNow} className="space-y-4">
-                       <div className="bg-[#0a0a0a] p-4 rounded-2xl flex items-center gap-4 border border-white/5 focus-within:border-[--app-primary] transition-colors relative overflow-hidden group">
-                          <MapPin size={20} className="text-[--app-secondary] shrink-0" />
-                          <input 
-                            value={pickup}
-                            onChange={(e) => setPickup(e.target.value)}
-                            placeholder="Pickup Location"
-                            className="bg-transparent w-full font-bold text-white placeholder-gray-500 outline-none text-lg"
-                            required
-                          />
-                       </div>
-                       
-                       <div className="bg-[#0a0a0a] p-4 rounded-2xl flex items-center gap-4 border border-white/5 focus-within:border-[--app-secondary] transition-colors relative overflow-hidden group">
-                          <Navigation size={20} className="text-[--app-primary] shrink-0" />
-                          <input 
-                            value={drop}
-                            onChange={(e) => setDrop(e.target.value)}
-                            placeholder="Drop Location"
-                            className="bg-transparent w-full font-bold text-white placeholder-gray-500 outline-none text-lg"
-                            required
-                          />
-                       </div>
+                     <form onSubmit={onBookNow} className="space-y-4">
+                        {/* Vehicle Selection - Integrated */}
+                         <div className="bg-[#1a1a1a] p-2 rounded-full flex items-center justify-between mb-6 shadow-inner border border-white/5">
+                            {['Bike', 'Auto', 'Car', 'Traveller'].map((vehicle) => (
+                                <button
+                                   key={vehicle}
+                                   type="button"
+                                   onClick={() => setSelectedVehicle(vehicle)}
+                                   className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold transition-all ${
+                                      selectedVehicle === vehicle 
+                                      ? 'bg-yellow-400 text-black shadow-[0_0_20px_rgba(255,215,0,0.4)]' 
+                                      : 'text-gray-400 hover:text-white'
+                                   }`}
+                                >
+                                    {vehicle === 'Bike' && <Bike size={18} />}
+                                    {vehicle === 'Auto' && <AutoRickshawIcon size={18} />} 
+                                    {vehicle === 'Car' && <Car size={18} />}
+                                    {vehicle === 'Traveller' && <Bus size={18} />}
+                                    <span className="hidden md:inline">{vehicle}</span>
+                                </button>
+                            ))}
+                         </div>
 
-                       {/* Ride Types Selection */}
-                       <div className="mt-6 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                          <div className="min-w-[120px] p-3 border-2 border-[--app-primary] bg-[#000] rounded-2xl cursor-pointer flex flex-col justify-between relative overflow-hidden">
-                             <div className="absolute top-0 right-0 p-1 bg-[--app-primary] rounded-bl-lg">
-                                <Zap size={10} className="text-black fill-current" />
-                             </div>
-                             <AutoRickshawIcon size={32} className="text-[--app-primary] mb-2" />
-                             <div>
-                               <div className="font-bold text-sm text-white">NammAuto</div>
-                               <div className="text-xs font-bold text-gray-400 line-through">₹60</div>
-                               <div className="text-sm font-bold text-[--app-primary]">₹40</div>
-                             </div>
-                          </div>
-                          
-                          <div className="min-w-[120px] p-3 border border-white/10 bg-[#0a0a0a] rounded-2xl cursor-pointer flex flex-col justify-between opacity-60 hover:opacity-100 transition-opacity">
-                             <Zap size={32} className="text-gray-500 mb-2" />
-                             <div>
-                               <div className="font-bold text-sm text-white">Fast</div>
-                               <div className="text-xs font-bold text-gray-400">₹80-90</div>
-                             </div>
-                          </div>
-                       </div>
+                        {/* Car Type Selection - Only for Car */}
+                        {selectedVehicle === 'Car' && (
+                           <div className="flex gap-3 mb-6">
+                              {['Mini', 'SUV'].map((type) => (
+                                 <button
+                                    key={type}
+                                    type="button"
+                                    onClick={() => setCarType(type)}
+                                    className={`flex-1 py-2 rounded-xl border font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                                       carType === type
+                                       ? 'bg-[--app-secondary] text-green-900 border-[--app-secondary] shadow-[0_0_15px_var(--app-secondary)]'
+                                       : 'bg-white/5 text-gray-400 border-white/10 hover:border-white/30 hover:bg-white/10'
+                                    }`}
+                                 > 
+                                    {type === 'Mini' ? 'Hatchback/Mini' : 'Sedan/SUV'}
+                                 </button>
+                              ))}
+                           </div>
+                        )}
 
-                       <button type="submit" className="w-full py-4 mt-4 bg-black border border-white/20 text-white font-[--font-display] font-bold text-lg rounded-2xl hover:bg-white hover:text-black hover:border-transparent transition-all shadow-lg active:scale-95">
-                         Book NammAuto
-                       </button>
-                    </form>
+                        <div className="bg-[#0a0a0a] p-4 rounded-2xl flex items-center gap-4 border border-white/5 focus-within:border-[--app-primary] transition-colors relative overflow-hidden group">
+                           <MapPin size={20} className="text-[--app-secondary] shrink-0" />
+                           <input 
+                             value={pickup}
+                             onChange={(e) => setPickup(e.target.value)}
+                             placeholder="Pickup Location"
+                             className="bg-transparent w-full font-bold text-white placeholder-gray-500 outline-none text-lg"
+                             required
+                           />
+                        </div>
+                        
+                        <div className="bg-[#0a0a0a] p-4 rounded-2xl flex items-center gap-4 border border-white/5 focus-within:border-[--app-secondary] transition-colors relative overflow-hidden group">
+                           <Navigation size={20} className="text-[--app-primary] shrink-0" />
+                           <input 
+                             value={drop}
+                             onChange={(e) => setDrop(e.target.value)}
+                             placeholder="Drop Location"
+                             className="bg-transparent w-full font-bold text-white placeholder-gray-500 outline-none text-lg"
+                             required
+                           />
+                        </div>
+
+                        <button type="submit" className="w-full py-4 mt-4 bg-black border border-white/20 text-white font-[--font-display] font-bold text-lg rounded-2xl hover:bg-white hover:text-black hover:border-transparent transition-all shadow-lg active:scale-95">
+                          View Ride Options ▼
+                        </button>
+                     </form>
                   </div>
               </motion.div>
             )}
@@ -249,8 +247,8 @@ const Home = () => {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-[--font-display] font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#00FF00] to-[gold]">Why NammAuto?</h2>
-            <p className="text-[--app-primary]/60 text-xl font-medium">We make your daily commute effortless</p>
+            <h2 className="text-3xl md:text-4xl font-[--font-display] font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#00FF00] to-[gold]">Why NammAuto?</h2>
+            <p className="text-[--app-primary]/60 text-lg md:text-xl font-medium">We make your daily commute effortless</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -282,10 +280,10 @@ const Home = () => {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-[--font-display] font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#00FF00] to-[gold]">
+            <h2 className="text-3xl md:text-4xl font-[--font-display] font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#00FF00] to-[gold]">
               Ride Your Way - {selectedVehicle === 'Car' ? `${selectedVehicle} (${carType.split('-')[0]})` : selectedVehicle}
             </h2>
-            <p className="text-[--app-primary]/60 text-xl font-medium">Choose the perfect trip for your needs</p>
+            <p className="text-[--app-primary]/60 text-lg md:text-xl font-medium">Choose the perfect trip for your needs</p>
           </div>
 
 
@@ -298,7 +296,7 @@ const Home = () => {
                 </div>
                 <h3 className="text-2xl font-bold mb-3 font-[--font-display] text-white">Drop Off</h3>
                 <p className="text-gray-400 mb-6">One-way trip to your destination. Quick and affordable.</p>
-                <button onClick={handleBookRide} className="px-6 py-2 rounded-full border border-[#00FFFF] text-[#00FFFF] font-bold hover:bg-[#00FFFF] hover:text-black transition-colors">Book Now</button>
+                <button onClick={() => confirmBooking('drop_off')} className="relative z-20 px-6 py-2 rounded-full border border-[#00FFFF] text-[#00FFFF] font-bold hover:bg-[#00FFFF] hover:text-black transition-colors cursor-pointer">Book Ride</button>
              </div>
              {/* Round Trip */}
              <div className="p-8 rounded-3xl bg-[--app-surface] border-2 border-transparent hover:border-[#00FF00] relative group overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-[#00FF00]/20 flex flex-col items-center text-center">
@@ -309,7 +307,7 @@ const Home = () => {
                 </div>
                 <h3 className="text-2xl font-bold mb-3 font-[--font-display] text-white">Round Trip</h3>
                 <p className="text-gray-400 mb-6">Go there and back again with ease. Perfect for errands or visits.</p>
-                <button onClick={handleBookRide} className="px-6 py-2 rounded-full border border-[#00FF00] text-[#00FF00] font-bold hover:bg-[#00FF00] hover:text-black transition-colors">Book Now</button>
+                <button onClick={() => confirmBooking('round_trip')} className="relative z-20 px-6 py-2 rounded-full border border-[#00FF00] text-[#00FF00] font-bold hover:bg-[#00FF00] hover:text-black transition-colors cursor-pointer">Book Ride</button>
              </div>
 
              {/* Hourly Rental */}
@@ -320,7 +318,7 @@ const Home = () => {
                 </div>
                 <h3 className="text-2xl font-bold mb-3 font-[--font-display] text-white">Hourly Rental</h3>
                 <p className="text-gray-400 mb-6">Keep the auto for as long as you need. Multiple stops, one price.</p>
-                <button onClick={handleBookRide} className="px-6 py-2 rounded-full border border-[gold] text-[gold] font-bold hover:bg-[gold] hover:text-black transition-colors">Rent for Hours</button>
+                <button onClick={() => confirmBooking('hourly')} className="relative z-20 px-6 py-2 rounded-full border border-[gold] text-[gold] font-bold hover:bg-[gold] hover:text-black transition-colors cursor-pointer">Book Ride</button>
              </div>
 
              {/* Trip for a Day */}
@@ -329,9 +327,10 @@ const Home = () => {
                 <div className="w-20 h-20 rounded-full bg-[orange]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[orange]"><circle cx="12" cy="12" r="5"/><path d="M12 1v2"/><path d="M12 21v2"/><path d="M4.22 4.22l1.42 1.42"/><path d="M18.36 18.36l1.42 1.42"/><path d="M1 12h2"/><path d="M21 12h2"/><path d="M4.22 19.78l1.42-1.42"/><path d="M18.36 5.64l1.42-1.42"/></svg>
                 </div>
+                
                 <h3 className="text-2xl font-bold mb-3 font-[--font-display] text-white">Full Day Pass</h3>
                 <p className="text-gray-400 mb-6">Explore the city without limits. Your personal driver for the whole day.</p>
-                <button onClick={handleBookRide} className="px-6 py-2 rounded-full border border-[orange] text-[orange] font-bold hover:bg-[orange] hover:text-black transition-colors">Book for Day</button>
+                <button onClick={() => confirmBooking('full_day')} className="relative z-20 px-6 py-2 rounded-full border border-[orange] text-[orange] font-bold hover:bg-[orange] hover:text-black transition-colors cursor-pointer">Book Ride</button>
              </div>
           </div>
         </div>
@@ -339,8 +338,8 @@ const Home = () => {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-[--font-display] font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#00FF00] to-[gold]">What people say</h2>
-            <p className="text-[--app-primary]/60 text-xl font-medium">Trusted by thousands of riders and drivers</p>
+            <h2 className="text-3xl md:text-4xl font-[--font-display] font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#00FF00] to-[gold]">What people say</h2>
+            <p className="text-[--app-primary]/60 text-lg md:text-xl font-medium">Trusted by thousands of riders and drivers</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -421,6 +420,154 @@ const Home = () => {
             © {new Date().getFullYear()} NammAuto. All rights reserved. Made with ❤️ in Salem.
          </div>
       </footer>
+
+
+      {/* Searching Overlay */}
+      {activeBooking && activeBooking.status === 'pending' && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+           <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative text-center p-8">
+              <div className="mb-6 relative">
+                 {/* Radar Pulse Effect */}
+                 <div className="absolute inset-0 bg-[#00FF00]/20 rounded-full animate-ping" />
+                 <div className="w-24 h-24 mx-auto rounded-full bg-black flex items-center justify-center text-4xl relative z-10 border-4 border-[#00FF00]">
+                    <TyreSpinner />
+                 </div>
+              </div>
+              <h2 className="text-2xl font-[--font-display] font-bold text-black mb-2">Booking Successful!</h2>
+              <p className="text-gray-500 text-sm font-medium mb-8">Connecting to crew...</p>
+              
+              <div className="flex gap-3 justify-center text-xs font-bold uppercase tracking-wider text-gray-400">
+                 <span className="animate-bounce delay-0">●</span>
+                 <span className="animate-bounce delay-100">●</span>
+                 <span className="animate-bounce delay-200">●</span>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* Driver Found Overlay */}
+      {activeBooking && activeBooking.status === 'accepted' && assignedDriver && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+           <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative">
+              {/* Header Gradient */}
+              <div className="bg-gradient-to-r from-[#00FF00] to-[gold] p-6 text-center pt-8 pb-12">
+                 <h2 className="text-2xl font-[--font-display] font-bold text-black drop-shadow-sm">Booking Confirmed!</h2>
+                 <p className="text-black/80 font-bold uppercase text-xs mt-1 tracking-wider">{activeBooking.type?.replace('_', ' ')} • {activeBooking.vehicle}</p>
+              </div>
+
+              <div className="px-6 -mt-8 pb-6 relative z-10">
+                 {/* Driver Card */}
+                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 mb-6 flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center text-3xl border-2 border-white shadow-md">
+                       🛺
+                    </div>
+                    <div>
+                       <div className="text-xs text-black font-bold uppercase tracking-wider mb-1">Crew Details</div>
+                       <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Your Driver</div>
+                       <div className="text-xl font-bold text-black">{assignedDriver.name}</div>
+                       <div className="flex text-yellow-500">
+                          {[...Array(5)].map((_, i) => (
+                             <Star key={i} size={12} fill="currentColor" className={i < Math.floor(assignedDriver.rating) ? "" : "text-gray-200"} />
+                          ))}
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Trip Details */}
+                 <div className="space-y-6 mb-8 relative pl-6">
+                    {/* Dashed Line */}
+                    <div className="absolute left-[11px] top-3 bottom-8 w-[2px] border-l-2 border-dashed border-gray-200" />
+                    
+                    <div className="relative">
+                       <div className="absolute -left-6 top-1 w-6 h-6 rounded-full bg-white border-4 border-gray-100 shadow-sm flex items-center justify-center shrink-0" />
+                       <div className="text-xs text-gray-400 font-bold uppercase">Pickup</div>
+                       <div className="font-bold text-gray-800 text-lg leading-tight">{activeBooking.from}</div>
+                    </div>
+
+                    <div className="relative">
+                       <div className="absolute -left-6 top-1 w-6 h-6 rounded-full bg-black border-4 border-gray-300 shadow-sm flex items-center justify-center shrink-0 text-white">
+                          <Navigation size={10} />
+                       </div>
+                       <div className="text-xs text-gray-400 font-bold uppercase">Drop</div>
+                       <div className="font-bold text-gray-800 text-lg leading-tight">{activeBooking.to}</div>
+                    </div>
+                 </div>
+
+                 {/* Actions */}
+                 <div className="flex gap-4">
+                    <button 
+                       onClick={cancelRide}
+                       className="flex-1 py-4 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                    >
+                       Cancel
+                    </button>
+                    <button 
+                       onClick={() => {
+                         if (showPhone) {
+                           window.location.href = `tel:${assignedDriver.phone.replace(/\s/g, '')}`;
+                         } else {
+                           setShowPhone(true);
+                         }
+                       }}
+                       className="flex-1 py-4 bg-black text-white font-bold rounded-xl hover:bg-gray-900 transition-colors shadow-lg flex flex-col items-center justify-center leading-none"
+                    >
+                       <span>{showPhone ? assignedDriver.phone : 'Call Driver'}</span>
+                       {showPhone && <span className="text-[10px] text-green-400 font-normal mt-1">Tap to dial</span>}
+                    </button>
+                 </div>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* Rating & Review Overlay */}
+      {activeBooking && activeBooking.status === 'completed' && (user?.id === activeBooking.passengerId || !user) && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+           <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative text-center p-6">
+              <div className="mb-6">
+                 <div className="w-20 h-20 mx-auto rounded-full bg-green-100 flex items-center justify-center text-4xl mb-4 border-4 border-white shadow-lg animate-bounce-short">
+                    🎉
+                 </div>
+                 <h2 className="text-2xl font-[--font-display] font-bold text-black mb-1">Ride Completed!</h2>
+                 <p className="text-gray-500 text-sm">How was your ride with <span className="font-bold text-black">{assignedDriver?.name || 'your driver'}</span>?</p>
+              </div>
+
+              {/* Star Rating */}
+              <div className="flex justify-center gap-2 mb-6">
+                 {[1, 2, 3, 4, 5].map((star) => (
+                    <button 
+                       key={star}
+                       onClick={() => setRating(star)}
+                       className="transition-transform hover:scale-110 focus:outline-none"
+                    >
+                       <Star 
+                          size={32} 
+                          fill={star <= rating ? "#FFD700" : "none"} 
+                          className={star <= rating ? "text-[gold]" : "text-gray-300"} 
+                          strokeWidth={1.5}
+                       />
+                    </button>
+                 ))}
+              </div>
+
+              {/* Review Text */}
+              <textarea 
+                 value={review}
+                 onChange={(e) => setReview(e.target.value)}
+                 placeholder="Write a review (optional)..."
+                 className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 mb-6 outline-none focus:ring-2 focus:ring-[--app-primary] text-black resize-none h-24 font-medium"
+              />
+
+              <button 
+                 onClick={() => submitReview(rating, review)}
+                 disabled={rating === 0}
+                 className="w-full py-4 bg-black disabled:bg-gray-300 text-white font-bold rounded-xl hover:bg-gray-900 transition-all shadow-lg active:scale-95"
+              >
+                 Submit Feedback
+              </button>
+           </div>
+        </div>
+      )}
     </div>
   );
 };

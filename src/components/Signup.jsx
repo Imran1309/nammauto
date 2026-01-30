@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+import { useRadio } from '../context/RadioContext';
 import { toast } from 'sonner';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { login } = useRadio();
   const [role, setRole] = useState('user');
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '', vehicleType: 'Auto', carType: '' });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.name && formData.email && formData.password) {
-      toast.success(`Account created! Welcome, ${formData.name}`);
-      // In a real app, API call goes here
-      navigate(`/login/${role}`);
+      // Auto-login and redirect to home
+      login(
+         formData.name, 
+         role, 
+         formData.email, 
+         formData.phone, 
+         role === 'driver' ? { type: formData.vehicleType, subType: formData.carType } : null
+      );
+      navigate('/');
     } else {
       toast.error('Please fill all fields');
     }
@@ -80,16 +90,67 @@ const Signup = () => {
           </div>
           <div>
             <label className="block text-xs font-bold text-[--app-primary] uppercase mb-1 tracking-wider">Password</label>
+            <div className="relative">
              <input 
-               type="password" 
+               type={showPassword ? 'text' : 'password'}
                value={formData.password}
                onChange={e => setFormData({...formData, password: e.target.value})}
-               className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-[#333] focus:bg-[#1a1a1a] focus:border-[--app-primary] focus:ring-1 focus:ring-[--app-primary] transition-colors font-bold text-white placeholder-gray-600 outline-none"
+               className="w-full px-4 py-3 rounded-xl bg-[#0a0a0a] border border-[#333] focus:bg-[#1a1a1a] focus:border-[--app-primary] focus:ring-1 focus:ring-[--app-primary] transition-colors font-bold text-white placeholder-gray-600 outline-none pr-12"
                placeholder="••••••••"
                style={{ backgroundColor: '#0a0a0a', color: 'white' }}
                required
             />
+            <button
+               type="button"
+               onClick={() => setShowPassword(!showPassword)}
+               className="absolute right-4 top-1/2 -translate-y-1/2 text-[gold] hover:text-yellow-400 transition-colors"
+            >
+               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+            </div>
           </div>
+
+          {role === 'driver' && (
+             <div className="space-y-4 pt-2 border-t border-gray-800">
+                <label className="block text-xs font-bold text-[gold] uppercase tracking-wider mb-2">Vehicle Details</label>
+                
+                <div className="grid grid-cols-2 gap-2">
+                   {['Auto', 'Car', 'Bike', 'Traveller'].map((v) => (
+                      <button
+                         key={v}
+                         type="button"
+                         onClick={() => setFormData(prev => ({ ...prev, vehicleType: v, carType: v !== 'Car' ? '' : prev.carType || 'Mini' }))}
+                         className={`py-3 rounded-lg font-bold text-sm border transiton-all ${
+                            formData.vehicleType === v 
+                            ? 'bg-[--app-primary] text-black border-[--app-primary]' 
+                            : 'bg-[#1a1a1a] text-gray-400 border-[#333] hover:border-gray-500'
+                         }`}
+                      >
+                         {v}
+                      </button>
+                   ))}
+                </div>
+
+                {formData.vehicleType === 'Car' && (
+                   <div className="flex gap-2 mt-2 animate-in fade-in slide-in-from-top-2">
+                      {['Mini', 'SUV'].map((t) => (
+                         <button
+                            key={t}
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, carType: t }))}
+                            className={`flex-1 py-2 rounded-lg font-bold text-xs border transition-all ${
+                               formData.carType === t
+                               ? 'bg-[gold] text-black border-[gold]'
+                               : 'bg-[#1a1a1a] text-gray-400 border-[#333]'
+                            }`}
+                         >
+                            {t}
+                         </button>
+                      ))}
+                   </div>
+                )}
+             </div>
+          )}
 
           <button className="w-full py-4 bg-[gold] text-black font-[--font-display] font-bold text-xl rounded-xl shadow-lg hover:bg-yellow-400 hover:scale-[1.02] transition-all mt-6 shadow-[gold]/20">
             Sign Up as {role === 'user' ? 'Passenger' : 'Driver'}

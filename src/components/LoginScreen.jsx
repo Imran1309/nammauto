@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRadio } from '../context/RadioContext';
 import { motion } from 'framer-motion';
-import { MapPin, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { MapPin, ArrowRight, Eye, EyeOff, Car } from 'lucide-react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 
 const HERO_BG = '/assets/hero_bg.png'; 
@@ -85,11 +85,13 @@ const LoginScreen = () => {
                </button>
 
                <button onClick={() => setRole('driver')} className="w-full group">
-                 <div className="bg-[#1a1a1a] hover:bg-[--app-secondary] p-4 rounded-xl shadow-lg border border-white/10 hover:border-transparent transition-all flex items-center justify-between group-hover:scale-105">
+                 <div className="bg-[#1a1a1a] hover:bg-[#86efac] p-4 rounded-xl shadow-lg border border-white/10 hover:border-transparent transition-all flex items-center justify-between group-hover:scale-105">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-[--app-primary]/20 flex items-center justify-center text-2xl">🛺</div>
+                      <div className="w-12 h-12 rounded-full bg-[green]/20 group-hover:bg-black/10 flex items-center justify-center text-2xl group-hover:text-black transition-colors">
+                        <Car size={24} className="text-green-500 group-hover:text-black" />
+                      </div>
                       <div className="text-left">
-                        <div className="font-bold text-lg text-white group-hover:text-black">I am a Driver</div>
+                        <div className="font-bold text-lg text-white group-hover:text-black">Drive</div>
                         <div className="text-xs text-gray-400 group-hover:text-black/70 font-medium">Start earning</div>
                       </div>
                     </div>
@@ -140,7 +142,7 @@ const LoginScreen = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[gold] hover:text-yellow-400 transition-colors"
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
