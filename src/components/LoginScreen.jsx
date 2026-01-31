@@ -27,7 +27,11 @@ const LoginScreen = () => {
       // Simulation: Use identifier as name for now since we removed the name field
       const simulatedName = identifier.split('@')[0]; 
       login(simulatedName, role, identifier, ''); 
-      navigate('/');
+      if (role === 'driver') {
+        navigate('/dashboard/driver');
+      } else {
+        navigate('/');
+      }
     }
   };
 

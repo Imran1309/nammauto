@@ -22,7 +22,7 @@ const Signup = () => {
          formData.phone, 
          role === 'driver' ? { type: formData.vehicleType, subType: formData.carType } : null
       );
-      navigate('/');
+      navigate(role === 'driver' ? '/dashboard/driver' : '/');
     } else {
       toast.error('Please fill all fields');
     }

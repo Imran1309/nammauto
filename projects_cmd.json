@@ -1,0 +1,38 @@
+{
+  "status": "success",
+  "result": [
+    {
+      "projectId": "charging-completed-alarm",
+      "projectNumber": "388770501175",
+      "displayName": "charging completed alarm",
+      "name": "projects/charging-completed-alarm",
+      "resources": {
+        "hostingSite": "charging-completed-alarm"
+      },
+      "state": "ACTIVE",
+      "etag": "1_7f5fdff1-a5f8-4b98-a781-1ef1830f4574"
+    },
+    {
+      "projectId": "nammauto-app-2026",
+      "projectNumber": "24987216345",
+      "displayName": "nammauto-app-2026",
+      "name": "projects/nammauto-app-2026",
+      "resources": {
+        "hostingSite": "nammauto-app-2026"
+      },
+      "state": "ACTIVE",
+      "etag": "1_1310fffd-2120-444c-ace3-b4447f5a5a9f"
+    },
+    {
+      "projectId": "pack-yours-holiday-app",
+      "projectNumber": "1060269158440",
+      "displayName": "Pack Yours",
+      "name": "projects/pack-yours-holiday-app",
+      "resources": {
+        "hostingSite": "pack-yours-holiday-app"
+      },
+      "state": "ACTIVE",
+      "etag": "1_d5186c37-00f0-4699-80f8-a8169d575e29"
+    }
+  ]
+}

@@ -5,10 +5,14 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const UserDashboard = () => {
-  const { user, logout, requestRide, activeBooking } = useRadio();
+  const { user, logout, requestRide, activeBooking, cancelRide, drivers } = useRadio();
   const navigate = useNavigate();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const [showPhone, setShowPhone] = useState(false);
+
+  // Derive assigned driver
+  const assignedDriver = activeBooking?.driverId ? drivers.find(d => d.id === activeBooking.driverId) : null;
 
   const handleLogout = () => {
     logout();
@@ -108,8 +112,20 @@ const UserDashboard = () => {
                 </div>
 
                 <div className="mt-8 flex gap-3">
-                   <button className="flex-1 py-4 bg-gray-100 rounded-xl font-bold text-gray-600">Cancel</button>
-                   <button className="flex-[2] py-4 bg-black text-white rounded-xl font-bold shadow-lg">Call Driver</button>
+                   <button 
+                     onClick={cancelRide}
+                     className="flex-1 py-4 bg-gray-100 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors"
+                   >
+                     Cancel
+                   </button>
+                   {activeBooking.status === 'accepted' && assignedDriver && (
+                     <button 
+                       onClick={() => setShowPhone(!showPhone)}
+                       className="flex-[2] py-4 bg-black text-white rounded-xl font-bold shadow-lg hover:bg-gray-900 transition-colors"
+                     >
+                       {showPhone ? assignedDriver.phone : "Call Driver"}
+                     </button>
+                   )}
                 </div>
              </div>
           </motion.div>
@@ -119,14 +135,7 @@ const UserDashboard = () => {
             animate={{ y: 0, opacity: 1 }}
             className="w-full"
           >
-            <div className="mb-8">
-              <h1 className="text-3xl md:text-4xl font-[--font-display] font-bold text-gray-800 mb-2">Where to?</h1>
-              <div className="flex gap-2">
-                 <span className="px-3 py-1 bg-white rounded-full text-xs font-bold text-gray-600 shadow-sm border">Home</span>
-                 <span className="px-3 py-1 bg-white rounded-full text-xs font-bold text-gray-600 shadow-sm border">Work</span>
-                 <span className="px-3 py-1 bg-white rounded-full text-xs font-bold text-gray-600 shadow-sm border">Gym</span>
-              </div>
-            </div>
+
 
             <form onSubmit={handleRequest} className="bg-[--app-surface] p-6 rounded-3xl shadow-xl border border-[--app-primary]/20 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[--app-primary] to-[--app-secondary]" />

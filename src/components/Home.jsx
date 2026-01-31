@@ -17,8 +17,22 @@ const Home = () => {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
 
+  const [distance, setDistance] = useState(0);
+
   // Derive assigned driver
   const assignedDriver = activeBooking?.driverId ? drivers.find(d => d.id === activeBooking.driverId) : null;
+
+  // Calculate mock distance
+  useEffect(() => {
+    if (pickup && drop) {
+       // Mock distance calculation for demo purposes
+       // Using string length to create a deterministic but changing value
+       const dist = ((pickup.length + drop.length) * 0.45); 
+       setDistance(dist > 50 ? 50 : dist.toFixed(1)); // Cap at 50km for realism
+    } else {
+       setDistance(0);
+    }
+  }, [pickup, drop]);
 
   const handleBookRide = () => {
     if (user) {
@@ -99,10 +113,14 @@ const Home = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-           
-             <h1 className="text-5xl md:text-8xl font-[--font-display] font-bold text-[--app-primary] leading-tight mb-6">
+          <h1 className="text-5xl md:text-8xl font-[--font-display] font-bold text-[green] leading-tight mb-6">
                
-               Ride <span className="text-[--app-secondary] inline-flex items-center gap-[1px] align-baseline">N<TyreSpinner />mmAut<TyreSpinner />.</span>
+               Ride
+             </h1>
+           
+             <h1 className="text-5xl md:text-8xl font-[--font-display] font-bold text-[gold] leading-tight mb-6">
+               
+               Ride <span className="text-[gold] inline-flex items-center gap-[1px] align-baseline">N<TyreSpinner />mmAut<TyreSpinner /></span>
              </h1>
              <p className="text-lg md:text-xl text-[--app-primary]/70 mb-6 max-w-lg font-medium">
                The fastest, safest, and most affordable way to travel. Connect with nearby auto drivers instantly. No bargaining, just riding.
@@ -123,7 +141,7 @@ const Home = () => {
 
 
             {/* Quick Booking Form (Logged In) */}
-            {user && (
+            {user && user.role !== 'driver' && (
               <motion.div 
                 id="booking-form"
                 initial={{ opacity: 0, y: 20 }}
@@ -370,7 +388,7 @@ const Home = () => {
         </div>
         {/* Roadside Rock Decoration */}
          <div className="absolute bottom-0 right-0 z-0 opacity-80 pointer-events-none transform translate-y-4 scale-75 md:scale-100 origin-bottom-right">
-             <Milestone />
+             <Milestone distance={distance} />
          </div>
       </section>
 
@@ -423,27 +441,7 @@ const Home = () => {
 
 
       {/* Searching Overlay */}
-      {activeBooking && activeBooking.status === 'pending' && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
-           <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative text-center p-8">
-              <div className="mb-6 relative">
-                 {/* Radar Pulse Effect */}
-                 <div className="absolute inset-0 bg-[#00FF00]/20 rounded-full animate-ping" />
-                 <div className="w-24 h-24 mx-auto rounded-full bg-black flex items-center justify-center text-4xl relative z-10 border-4 border-[#00FF00]">
-                    <TyreSpinner />
-                 </div>
-              </div>
-              <h2 className="text-2xl font-[--font-display] font-bold text-black mb-2">Booking Successful!</h2>
-              <p className="text-gray-500 text-sm font-medium mb-8">Connecting to crew...</p>
-              
-              <div className="flex gap-3 justify-center text-xs font-bold uppercase tracking-wider text-gray-400">
-                 <span className="animate-bounce delay-0">●</span>
-                 <span className="animate-bounce delay-100">●</span>
-                 <span className="animate-bounce delay-200">●</span>
-              </div>
-           </div>
-        </div>
-      )}
+
 
       {/* Driver Found Overlay */}
       {activeBooking && activeBooking.status === 'accepted' && assignedDriver && (
@@ -465,10 +463,14 @@ const Home = () => {
                        <div className="text-xs text-black font-bold uppercase tracking-wider mb-1">Crew Details</div>
                        <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Your Driver</div>
                        <div className="text-xl font-bold text-black">{assignedDriver.name}</div>
-                       <div className="flex text-yellow-500">
+                       <div className="flex text-yellow-500 mb-1">
                           {[...Array(5)].map((_, i) => (
                              <Star key={i} size={12} fill="currentColor" className={i < Math.floor(assignedDriver.rating) ? "" : "text-gray-200"} />
                           ))}
+                       </div>
+                       {/* Phone Number Display */}
+                       <div className="text-sm font-bold text-gray-800 bg-gray-100 rounded-lg px-2 py-1 inline-block">
+                         📞 {showPhone ? assignedDriver.phone : assignedDriver.phone.slice(0, 3) + '*******'}
                        </div>
                     </div>
                  </div>
@@ -606,7 +608,7 @@ const TyreSpinner = () => (
   </motion.div>
 );
 
-const Milestone = () => (
+const Milestone = ({ distance = 0 }) => (
   <motion.div 
     initial={{ y: 100, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
@@ -627,7 +629,7 @@ const Milestone = () => (
         
         <span className="text-black font-extrabold text-2xl font-[--font-display] z-10">SALEM</span>
         <div className="flex items-baseline gap-1 z-10 mt-1">
-          <span className="text-black font-black text-4xl font-sans">0</span>
+          <span className="text-black font-black text-4xl font-sans">{distance}</span>
           <span className="text-black/70 font-bold text-sm">km</span>
         </div>
     </div>

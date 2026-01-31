@@ -1,0 +1,156 @@
+{
+  "users": [
+    {
+      "id": "d4gj30c7u",
+      "_id": "ys96gl0cb",
+      "name": "imransurajbasha786",
+      "phone": "",
+      "role": "user",
+      "vehicleDetails": null,
+      "email": "imransurajbasha786@gmail.com",
+      "status": "online",
+      "location": "Unknown",
+      "rating": 5,
+      "createdAt": "2026-01-30T17:32:30.446Z"
+    },
+    {
+      "id": "x9eqoz10n",
+      "_id": "4oo46sb1c",
+      "name": "imran",
+      "phone": "6380272502",
+      "role": "user",
+      "vehicleDetails": null,
+      "email": "imranss1309@gmail.com",
+      "status": "online",
+      "location": "Unknown",
+      "rating": 5,
+      "createdAt": "2026-01-31T08:16:08.997Z"
+    },
+    {
+      "id": "3702bim08",
+      "_id": "jrrw7digy",
+      "name": "imran",
+      "phone": "+916380272502",
+      "role": "driver",
+      "vehicleDetails": {
+        "type": "Car",
+        "subType": "Mini"
+      },
+      "email": "imransurajbasha786@gmail.com",
+      "status": "online",
+      "location": "Unknown",
+      "rating": 5,
+      "createdAt": "2026-01-31T10:12:35.839Z"
+    },
+    {
+      "id": "unycxjibx",
+      "_id": "g2hgm7br6",
+      "name": "krishna",
+      "phone": "9698956688",
+      "role": "user",
+      "vehicleDetails": null,
+      "email": "dhanatrip2020@gmail.com",
+      "status": "offline",
+      "location": "Unknown",
+      "rating": 5,
+      "createdAt": "2026-01-31T10:29:53.473Z"
+    },
+    {
+      "id": "b0fn24tk2",
+      "_id": "i15rucr3n",
+      "name": "krishna",
+      "phone": "+919698956688",
+      "role": "driver",
+      "vehicleDetails": {
+        "type": "Auto",
+        "subType": ""
+      },
+      "email": "dhanatrip2020@gmail.com",
+      "status": "online",
+      "location": "Unknown",
+      "rating": 5,
+      "createdAt": "2026-01-31T10:53:07.105Z"
+    }
+  ],
+  "rides": [
+    {
+      "passengerId": "ys96gl0cb",
+      "passengerName": "imransurajbasha786",
+      "from": "salem old bus stand",
+      "to": "new bus stand",
+      "vehicle": "Auto",
+      "type": "drop_off",
+      "id": "1769794372713",
+      "_id": "1769794372713",
+      "status": "completed",
+      "createdAt": "2026-01-30T17:32:52.713Z",
+      "driverId": "jrrw7digy",
+      "price": "₹40"
+    },
+    {
+      "passengerId": "4oo46sb1c",
+      "passengerName": "imran",
+      "from": "salem new bus stand",
+      "to": "old bus stand",
+      "vehicle": "Auto",
+      "type": "drop_off",
+      "id": "1769847449645",
+      "_id": "1769847449645",
+      "status": "cancelled",
+      "createdAt": "2026-01-31T08:17:29.645Z"
+    },
+    {
+      "passengerId": "ys96gl0cb",
+      "passengerName": "imransurajbasha786",
+      "from": "old bus stand",
+      "to": "new bus stand",
+      "vehicle": "Auto",
+      "type": "drop_off",
+      "id": "1769853804208",
+      "_id": "1769853804208",
+      "status": "completed",
+      "createdAt": "2026-01-31T10:03:24.208Z",
+      "driverId": "jrrw7digy",
+      "price": "₹40"
+    },
+    {
+      "passengerId": "g2hgm7br6",
+      "passengerName": "krishna",
+      "from": "new bus stand",
+      "to": "old bus stand",
+      "vehicle": "Car (Mini)",
+      "type": "round_trip",
+      "id": "1769855420352",
+      "_id": "1769855420352",
+      "status": "pending",
+      "createdAt": "2026-01-31T10:30:20.352Z"
+    },
+    {
+      "passengerId": "ys96gl0cb",
+      "passengerName": "imransurajbasha786",
+      "from": "new bus stand",
+      "to": "old bus stand",
+      "vehicle": "Car (Mini)",
+      "type": "round_trip",
+      "id": "1769856719377",
+      "_id": "1769856719377",
+      "status": "pending",
+      "createdAt": "2026-01-31T10:51:59.377Z"
+    },
+    {
+      "passengerId": "ys96gl0cb",
+      "passengerName": "imransurajbasha786",
+      "passengerPhone": "",
+      "from": "old bus stand",
+      "to": "new bus stand",
+      "vehicle": "Auto",
+      "type": "drop_off",
+      "id": "1769858119615",
+      "_id": "1769858119615",
+      "status": "cancelled",
+      "createdAt": "2026-01-31T11:15:19.615Z",
+      "driverId": "i15rucr3n",
+      "price": "₹40"
+    }
+  ]
+}

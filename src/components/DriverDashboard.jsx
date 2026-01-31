@@ -258,56 +258,79 @@ const DriverDashboard = () => {
                </motion.div>
             ) : (
 
+
                <div className="space-y-4">
-                  <h3 className="font-bold text-gray-500 uppercase text-xs tracking-wider mb-2 px-2">Nearby Requests ({drivers.find(d => d.id === user.id)?.vehicle || 'Auto'})</h3>
+                  <div className="flex items-center justify-between px-2 mb-2">
+                     <h3 className="font-bold text-gray-500 uppercase text-xs tracking-wider flex items-center gap-2">
+                        Live Ride Requests
+                        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"/>
+                     </h3>
+                     <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                        {drivers.find(d => d.id === user.id)?.vehicle || 'All Vehicles'}
+                     </span>
+                  </div>
+                  
                   {[
                      ...pendingRequests.map(req => ({
                         id: req.id,
                         name: req.passengerName, 
-                        phone: '98765 00000', 
+                        phone: req.passengerPhone || '98765 00000', 
                         pickup: req.from,
                         drop: req.to,
-                        dist: '0.5 km', 
+                        dist: '0.8 km', 
                         price: req.price || '₹' + (Math.floor(Math.random() * 50) + 40), 
                         vehicle: req.vehicle, 
-                        type: req.type
+                        type: req.type,
+                        isNew: true
                      })),
-                     { id: 'm1', name: 'Priya S', phone: '98765 12345', pickup: 'Fairlands Main Rd', drop: 'New Bus Stand', dist: '0.8 km', price: '₹50', vehicle: 'Auto' },
-                     { id: 'm2', name: 'Karthik R', phone: '98765 67890', pickup: 'Junction Station', drop: 'AVR Roundana', dist: '2.1 km', price: '₹85', vehicle: 'Auto' },
-                     { id: 'm3', name: 'Sarah M', phone: '99887 77665', pickup: 'Sarada College', drop: 'Omalur Toll', dist: '1.5 km', price: '₹65', vehicle: 'Bike' }
+                     { id: 'm1', name: 'Priya S', phone: '98765 12345', pickup: 'Fairlands Main Rd', drop: 'New Bus Stand', dist: '1.2 km', price: '₹50', vehicle: 'Auto', type: 'drop_off' },
+                     { id: 'm2', name: 'Karthik R', phone: '98765 67890', pickup: 'Junction Station', drop: 'AVR Roundana', dist: '2.5 km', price: '₹85', vehicle: 'Auto', type: 'round_trip' },
+                     { id: 'm3', name: 'Sarah M', phone: '99887 77665', pickup: 'Sarada College', drop: 'Omalur Toll', dist: '3.0 km', price: '₹65', vehicle: 'Bike', type: 'drop_off' }
                   ]
                   .filter(req => {
                      const myVehicle = drivers.find(d => d.id === user.id)?.vehicle || 'Auto';
-                     // Simple inclusion check to handle "Car (SUV)" matching "Car" if we wanted, 
-                     // but for now strict equality based on user request is best or exact string match.
-                     // The user request produces "Car (Mini)" and driver has "Car (Mini)".
-                     
-                     if (!req.vehicle) return true; // Show if no vehicle specified (fallback)
-                     return req.vehicle === myVehicle;
+                     // Inclusive filtering: 
+                     // 1. Exact match
+                     // 2. Request vehicle contains my vehicle (e.g. "Car (Mini)" includes "Car")
+                     // 3. My vehicle contains request vehicle (e.g. "Car" includes "Car")
+                     // 4. Fallback if no vehicle specified
+                     if (!req.vehicle) return true;
+                     const reqV = req.vehicle.toLowerCase();
+                     const myV = myVehicle.toLowerCase();
+                     return reqV.includes(myV) || myV.includes(reqV.split(' ')[0]) || (myV === 'auto' && reqV === 'auto');
                   })
                   .map((req) => (
                      <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         key={req.id} 
-                        className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group"
+                        className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:border-black transition-colors"
                      >
+                        {req.isNew && (
+                           <div className="absolute top-0 right-0 bg-[--app-primary] text-black text-[10px] font-bold px-2 py-1 rounded-bl-xl shadow-sm z-10">
+                              NEW
+                           </div>
+                        )}
+
                         <div className="flex justify-between items-start mb-4">
                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600">
+                              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 border border-gray-200">
                                  {req.name.charAt(0)}
                               </div>
                               <div>
-                                 <div className="font-bold text-gray-800">{req.name}</div>
+                                 <div className="font-bold text-gray-800 flex items-center gap-2">
+                                    {req.name}
+                                    {req.isNew && <span className="w-1.5 h-1.5 rounded-full bg-green-500"/>}
+                                 </div>
                                  <div className="text-xs text-gray-500 font-bold">{req.dist} away</div>
                                  <div className="text-xs text-green-600 font-bold mt-1 flex items-center gap-1">
                                     <span>📞</span> {req.phone}
                                  </div>
                                  <div className="flex gap-2 mt-2">
-                                     <span className="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded border border-yellow-200 uppercase">
-                                       {req.vehicle || 'Auto'}
+                                     <span className="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded border border-gray-200 uppercase flex items-center gap-1">
+                                       {req.vehicle?.includes('Auto') ? '🛺' : '🚗'} {req.vehicle || 'Auto'}
                                      </span>
-                                     <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded border border-blue-200 uppercase">
+                                     <span className="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded border border-blue-100 uppercase">
                                        {req.type?.replace('_', ' ') || 'Drop Off'}
                                      </span>
                                  </div>
@@ -315,25 +338,29 @@ const DriverDashboard = () => {
                            </div>
                            <div className="text-right">
                               <div className="font-[--font-display] font-bold text-xl text-[--app-primary-dark]">{req.price}</div>
+                              <div className="text-[10px] text-gray-400 font-bold underline decoration-dotted">Cash</div>
                            </div>
                         </div>
 
-                        <div className="flex items-center gap-8 mb-4">
-                           <div className="relative pl-4">
-                              <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-green-500" />
-                              <div className="text-sm font-medium text-gray-600 truncate max-w-[120px]">{req.pickup}</div>
+                        <div className="flex flex-col gap-3 mb-4 relative pl-3.5 border-l border-dashed border-gray-300 ml-1.5 my-2 py-1">
+                           <div className="relative">
+                              <div className="absolute -left-[19px] top-1.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-white shadow-sm" />
+                              <div className="text-xs text-gray-400 font-bold uppercase mb-0.5">Pickup</div>
+                              <div className="text-sm font-bold text-gray-800 truncate leading-tight">{req.pickup}</div>
                            </div>
-                           <div className="relative pl-4">
-                              <div className="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-red-500" />
-                              <div className="text-sm font-medium text-gray-600 truncate max-w-[120px]">{req.drop}</div>
+                           <div className="relative">
+                              <div className="absolute -left-[19px] top-1.5 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white shadow-sm" />
+                              <div className="text-xs text-gray-400 font-bold uppercase mb-0.5">Drop</div>
+                              <div className="text-sm font-bold text-gray-800 truncate leading-tight">{req.drop}</div>
                            </div>
                         </div>
 
                         <button 
                            onClick={() => acceptRide(req)}
-                           className="w-full py-3 bg-black text-white rounded-xl font-bold text-sm shadow-lg group-hover:bg-[green] transition-colors"
+                           className="w-full py-3.5 bg-black text-white rounded-xl font-[--font-display] font-bold text-lg shadow-lg hover:bg-[green] hover:shadow-[green]/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
-                           Accept Ride
+                           <span>Accept Ride</span>
+                           <span className="bg-white/20 px-1.5 rounded text-xs">30s</span>
                         </button>
                      </motion.div>
                   ))}
