@@ -42,12 +42,10 @@ app.use(async (req, res, next) => {
     next();
 });
 
-// For local development or Render deployment
-if (process.env.NODE_ENV !== 'production' || process.env.RENDER) {
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    });
-}
+// Start Server
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
 
 export default app;
