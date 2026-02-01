@@ -104,15 +104,9 @@ const Home = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-          <h1 className="text-5xl md:text-8xl font-[--font-display] font-bold text-[green] leading-tight mb-6">
-               
-               Ride
-             </h1>
-           
-             <h1 className="text-5xl md:text-8xl font-[--font-display] font-bold text-[gold] leading-tight mb-6">
-               
-               Ride <span className="text-[gold] inline-flex items-center gap-[1px] align-baseline">N<TyreSpinner />mmAut<TyreSpinner /></span>
-             </h1>
+              <h1 className="text-5xl md:text-8xl font-[--font-display] font-bold text-[gold] leading-tight mb-6 flex flex-wrap items-center gap-4">
+                Ride <span className="text-[green] inline-flex items-center gap-[1px]">N<TyreSpinner />mmAut<TyreSpinner /></span>
+              </h1>
              <p className="text-lg md:text-xl text-[--app-primary]/70 mb-6 max-w-lg font-medium">
                The fastest, safest, and most affordable way to travel. Connect with nearby auto drivers instantly. No bargaining, just riding.
              </p>
