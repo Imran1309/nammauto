@@ -17,9 +17,18 @@ export const RadioProvider = ({ children }) => {
   useEffect(() => {
     const stored = localStorage.getItem('namma_user');
     if (stored) {
-      const u = JSON.parse(stored);
-      setUser(u);
-      checkActiveRide(u.id); // Check if there's an ongoing ride from DB
+      try {
+        const u = JSON.parse(stored);
+        if (u && u.name) {
+             setUser(u);
+             checkActiveRide(u.id); 
+        } else {
+             localStorage.removeItem('namma_user');
+        }
+      } catch (err) {
+        console.error("Invalid session data", err);
+        localStorage.removeItem('namma_user');
+      }
     }
     fetchDrivers();
   }, []);
@@ -60,14 +69,17 @@ export const RadioProvider = ({ children }) => {
   const checkActiveRide = async (userId) => {
       try {
           const res = await fetch(`${API_URL}/rides/active/${userId}`);
-          const data = await res.json();
-          if (data) {
-             setActiveBooking(data);
-          } else if (activeBooking && activeBooking.status === 'completed') {
-             // Keep completed status until dismissed
-          } else {
-             setActiveBooking(null);
+          if (res.ok) {
+             const data = await res.json();
+             if (data) {
+                setActiveBooking(data);
+             } else if (activeBooking && activeBooking.status === 'completed') {
+                // Keep completed status until dismissed
+             } else {
+                setActiveBooking(null);
+             }
           }
+
       } catch (e) { console.error(e); }
   };
 

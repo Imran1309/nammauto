@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Star, Shield, Zap, Bike, Car, Bus, MapPin, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
+import Map from './Map';
 
 const Home = () => {
   const { user, requestRide, activeBooking, drivers, submitReview, cancelRide } = useRadio();
@@ -22,17 +23,7 @@ const Home = () => {
   // Derive assigned driver
   const assignedDriver = activeBooking?.driverId ? drivers.find(d => d.id === activeBooking.driverId) : null;
 
-  // Calculate mock distance
-  useEffect(() => {
-    if (pickup && drop) {
-       // Mock distance calculation for demo purposes
-       // Using string length to create a deterministic but changing value
-       const dist = ((pickup.length + drop.length) * 0.45); 
-       setDistance(dist > 50 ? 50 : dist.toFixed(1)); // Cap at 50km for realism
-    } else {
-       setDistance(0);
-    }
-  }, [pickup, drop]);
+
 
   const handleBookRide = () => {
     if (user) {
@@ -230,10 +221,22 @@ const Home = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
+            className="relative h-[500px] w-full"
           >
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[--app-primary]/20 rounded-full blur-[10px]" />
-             <img src="/assets/connect_3d.png" alt="3D Process" className="relative z-10 w-full drop-shadow-xl animate-float" />
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[--app-primary]/20 rounded-full blur-[100px] z-0" />
+             <div className="relative z-10 w-full h-full"> 
+                <Map 
+                    pickup={pickup}
+                    drop={drop}
+                    onDistanceChange={(d) => setDistance(d)}
+                    onPickupChange={(addr) => setPickup(addr)}
+                    onDropChange={(addr) => setDrop(addr)}
+                    onLocationFound={(coords) => {
+                        setPickup("Current Location (GPS)");
+                        toast.success("Location found!");
+                    }} 
+                />
+             </div>
           </motion.div>
         </div>
 

@@ -58,10 +58,10 @@ const Navbar = () => {
              <div className="flex items-center gap-4">
                <div className="flex items-center gap-3 bg-[--app-surface] px-4 py-2 rounded-xl border border-white/10">
                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[--app-primary] to-[--app-rose] flex items-center justify-center text-white font-bold text-sm">
-                   {user.name.charAt(0)}
+                   {user.name?.charAt(0) || 'U'}
                  </div>
                  <div className="text-white font-bold text-sm hidden lg:block">
-                   {user.name}
+                   {user.name || 'User'}
                  </div>
                  <button 
                    onClick={logout}
@@ -120,9 +120,9 @@ const Navbar = () => {
                 <div className="space-y-3">
                    <div className="flex items-center gap-3 text-white font-bold">
                      <div className="w-8 h-8 rounded-full bg-[--app-primary] flex items-center justify-center text-black">
-                       {user.name.charAt(0)}
+                       {user.name?.charAt(0) || 'U'}
                      </div>
-                     {user.name}
+                     {user.name || 'User'}
                    </div>
                    <button onClick={() => { logout(); setIsOpen(false); }} className="w-full py-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 font-bold text-center">
                      Logout

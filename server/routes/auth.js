@@ -1,37 +1,34 @@
+
 import express from 'express';
 const router = express.Router();
-import { db } from '../localDb.js';
+import User from '../models/User.js';
 
 // Login / Register
 router.post('/login', async (req, res) => {
     const { name, phone, role, vehicleDetails, email } = req.body;
 
     try {
-        let user = db.findUser(u => u.phone === phone);
+        let user = await User.findOne({ phone });
 
         if (!user) {
-            // Create new user
-            const newUser = {
-                id: Math.random().toString(36).substr(2, 9),
-                _id: Math.random().toString(36).substr(2, 9), // API expects this property
+            user = new User({
                 name,
                 phone,
                 role,
                 vehicleDetails,
                 email: email || `${phone}@nammauto.com`,
-                status: 'offline',
+                status: 'offline', // default
                 location: 'Unknown',
-                rating: 5.0,
-                createdAt: new Date().toISOString()
-            };
-            user = db.addUser(newUser);
+                rating: 5.0
+            });
+            await user.save();
         } else {
             // Update status if driver logs in
             if (role === 'driver') {
-                user = db.updateUser(user.id, { status: 'online' });
+                user.status = 'online';
+                await user.save();
             }
         }
-
         res.json(user);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -40,7 +37,7 @@ router.post('/login', async (req, res) => {
 
 router.get('/drivers', async (req, res) => {
     try {
-        const drivers = db.findUsers(u => u.role === 'driver' && u.status === 'online');
+        const drivers = await User.find({ role: 'driver', status: 'online' });
         res.json(drivers);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -50,7 +47,7 @@ router.get('/drivers', async (req, res) => {
 // Update driver status
 router.patch('/:id/status', async (req, res) => {
     try {
-        const user = db.updateUser(req.params.id, { status: req.body.status });
+        const user = await User.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
         if (user) {
             res.json(user);
         } else {

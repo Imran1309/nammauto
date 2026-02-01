@@ -1,18 +1,16 @@
+
 import express from 'express';
 const router = express.Router();
-import { db } from '../localDb.js';
+import Ride from '../models/Ride.js';
 
 // Create a ride request
 router.post('/', async (req, res) => {
     try {
-        const rideData = {
+        const ride = new Ride({
             ...req.body,
-            id: Date.now().toString(),
-            _id: Date.now().toString(), // API expects this
-            status: 'pending',
-            createdAt: new Date().toISOString()
-        };
-        const savedRide = db.addRide(rideData);
+            status: 'pending'
+        });
+        const savedRide = await ride.save();
         res.status(201).json(savedRide);
     } catch (err) {
         res.status(400).json({ message: err.message });
@@ -22,8 +20,7 @@ router.post('/', async (req, res) => {
 // Get pending rides (for drivers)
 router.get('/pending', async (req, res) => {
     try {
-        const rides = db.findRides(r => r.status === 'pending')
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const rides = await Ride.find({ status: 'pending' }).sort({ createdAt: -1 });
         res.json(rides);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -34,10 +31,11 @@ router.get('/pending', async (req, res) => {
 router.get('/active/:userId', async (req, res) => {
     try {
         const uid = req.params.userId;
-        const ride = db.findRide(r =>
-            (r.passengerId === uid || r.driverId === uid) &&
-            ['pending', 'accepted'].includes(r.status)
-        );
+        // Find ride where (passengerId OR driverId matches) AND status is pending or accepted
+        const ride = await Ride.findOne({
+            $or: [{ passengerId: uid }, { driverId: uid }],
+            status: { $in: ['pending', 'accepted'] }
+        });
         res.json(ride || null);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -47,7 +45,11 @@ router.get('/active/:userId', async (req, res) => {
 // Update ride status (accept, complete, cancel)
 router.patch('/:id', async (req, res) => {
     try {
-        const updatedRide = db.updateRide(req.params.id, req.body);
+        const updatedRide = await Ride.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
         if (updatedRide) {
             res.json(updatedRide);
         } else {

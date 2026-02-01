@@ -3,12 +3,39 @@ import { useRadio } from '../context/RadioContext';
 import { Power, MapPin, CheckCircle, Bell, Navigation } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const DriverDashboard = () => {
   const { user, logout, activeBooking, toggleStatus, drivers, acceptRide, completeRide, driverStats, updateDriverStats, pendingRequests } = useRadio();
   const navigate = useNavigate();
+
   const myStatus = drivers.find(d => d.id === user.id)?.status || 'online';
-  
+  // Default to "Salem" if location unknown, but ideally user.location has "Kondalampatti" etc.
+  const myLocation = user.location && user.location !== 'Unknown' ? user.location : 'Salem'; 
+
+  // Check proximity (Simple string match for MVP)
+  const isNearby = (pickupLocation) => {
+      if (!pickupLocation || !myLocation) return false;
+      const p = pickupLocation.toLowerCase();
+      const m = myLocation.toLowerCase();
+      // Match if pickup contains my location (e.g. "Kondalampatti" in "Kondalampatti Main Road")
+      // OR if my location contains pickup (e.g. "Salem" in "Salem Bus Stand")
+      return p.includes(m) || m.includes(p);
+  };
+
+  // Alert on new requests
+  useEffect(() => {
+     if (pendingRequests.length > 0) {
+        const latest = pendingRequests[0]; // Assuming sorted by new
+        if (isNearby(latest.from)) {
+            toast.success(`🔔 New request nearby at ${latest.from}!`, { duration: 5000 });
+            // Optional: Play sound here if desired
+        } else {
+            toast('New ride request available');
+        }
+     }
+  }, [pendingRequests.length]);
+
   const [editingStats, setEditingStats] = useState(false);
   const [tempStats, setTempStats] = useState({ earnings: 0, rides: 0 });
   const [manualAmount, setManualAmount] = useState('');
@@ -281,7 +308,10 @@ const DriverDashboard = () => {
                         price: req.price || '₹' + (Math.floor(Math.random() * 50) + 40), 
                         vehicle: req.vehicle, 
                         type: req.type,
-                        isNew: true
+                        vehicle: req.vehicle, 
+                        type: req.type,
+                        isNew: true,
+                        isNearby: isNearby(req.from)
                      })),
                      { id: 'm1', name: 'Priya S', phone: '98765 12345', pickup: 'Fairlands Main Rd', drop: 'New Bus Stand', dist: '1.2 km', price: '₹50', vehicle: 'Auto', type: 'drop_off' },
                      { id: 'm2', name: 'Karthik R', phone: '98765 67890', pickup: 'Junction Station', drop: 'AVR Roundana', dist: '2.5 km', price: '₹85', vehicle: 'Auto', type: 'round_trip' },
@@ -309,6 +339,11 @@ const DriverDashboard = () => {
                         {req.isNew && (
                            <div className="absolute top-0 right-0 bg-[--app-primary] text-black text-[10px] font-bold px-2 py-1 rounded-bl-xl shadow-sm z-10">
                               NEW
+                           </div>
+                        )}
+                        {req.isNearby && (
+                           <div className="absolute top-0 right-10 bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded-bl-xl rounded-br-xl shadow-sm z-10 animate-pulse">
+                              📍 NEARBY MATCH
                            </div>
                         )}
 
