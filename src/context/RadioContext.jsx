@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 const RadioContext = createContext();
-const API_URL = 'http://localhost:5000/api';
+const API_URL = '/api';
 
 export const useRadio = () => useContext(RadioContext);
 
