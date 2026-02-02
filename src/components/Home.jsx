@@ -429,7 +429,7 @@ const Home = () => {
                      <span className="text-[--app-primary]">📞</span> +91 8825635432
                   </li>
                   <li className="flex items-center gap-2">
-                     <span className="text-[--app-primary]">✉️</span> support@nammauto.com
+                     <span className="text-[--app-primary]">✉️</span> support@nammauto.in
                   </li>
                </ul>
             </div>

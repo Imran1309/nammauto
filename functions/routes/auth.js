@@ -16,7 +16,7 @@ router.post('/login', async (req, res) => {
                 phone,
                 role,
                 vehicleDetails,
-                email: email || `${phone}@nammauto.com`,
+                email: email || `${phone}@nammauto.in`,
                 status: 'offline', // default
                 location: 'Unknown',
                 rating: 5.0
