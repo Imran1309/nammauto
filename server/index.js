@@ -21,21 +21,26 @@ app.use('/api/rides', rideRoutes);
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-let isConnected = false;
 const connectDB = async () => {
-    if (isConnected) return;
+    if (mongoose.connection.readyState >= 1) {
+        return;
+    }
     try {
-        await mongoose.connect(MONGO_URI);
-        isConnected = true;
+        await mongoose.connect(MONGO_URI, {
+            serverSelectionTimeoutMS: 5000
+        });
         console.log("MongoDB Connected");
     } catch (err) {
         console.error("MongoDB connection error:", err);
     }
 };
 
-// Middleware to ensure DB connection on every request
+// Connect immediately when server starts
+connectDB();
+
+// Middleware to ensure DB connection on every request (useful for serverless cold starts)
 app.use(async (req, res, next) => {
-    if (req.method === 'OPTIONS') {
+    if (mongoose.connection.readyState >= 1) {
         return next();
     }
     await connectDB();

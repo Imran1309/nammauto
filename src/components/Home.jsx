@@ -51,7 +51,7 @@ const Home = () => {
 
      // Auto-fill locations if empty to ensure booking process completes for user convenience
      if (!currentPickup) {
-        currentPickup = "Salem Old Bus Stand";
+        currentPickup = "Tiruchengode Old Bus Stand";
         setPickup(currentPickup);
      }
      if (!currentDrop) {
@@ -104,6 +104,7 @@ const Home = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
+             <h1 className="text-5xl md:text-8xl font-[--font-display] font-bold text-[gold] leading-tight mb-6 flex flex-wrap items-center gap-4">Ride</h1>
               <h1 className="text-5xl md:text-8xl font-[--font-display] font-bold text-[gold] leading-tight mb-6 flex flex-wrap items-center gap-4">
                 Ride <span className="text-[green] inline-flex items-center gap-[1px]">N<TyreSpinner />mmAut<TyreSpinner /></span>
               </h1>
@@ -419,10 +420,13 @@ const Home = () => {
                <h3 className="text-xl font-bold text-[--app-secondary] mb-4">Contact Info</h3>
                <ul className="space-y-3 text-gray-400">
                   <li className="flex items-center gap-2">
-                     <span className="text-[--app-primary]">📍</span> 123, Gandhi Road, Salem
+                     <span className="text-[--app-primary]">📍</span> 6/28, KuttimaikanpattioRajapalayam (post)Tiruchengode (Tk)Namakkal-637 209
                   </li>
                   <li className="flex items-center gap-2">
-                     <span className="text-[--app-primary]">📞</span> +91 98765 43210
+                     <span className="text-[--app-primary]">📞</span> +91 8668167715
+                  </li>
+                  <li className="flex items-center gap-2">
+                     <span className="text-[--app-primary]">📞</span> +91 8825635432
                   </li>
                   <li className="flex items-center gap-2">
                      <span className="text-[--app-primary]">✉️</span> support@nammauto.com
@@ -432,7 +436,7 @@ const Home = () => {
          </div>
          
          <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-            © {new Date().getFullYear()} NammAuto. All rights reserved. Made with ❤️ in Salem.
+            © {new Date().getFullYear()} NammAuto. All rights reserved. Made with ❤️ in Tiruchengode.
          </div>
       </footer>
 
@@ -610,7 +614,7 @@ const Milestone = ({ distance = 0 }) => (
     initial={{ y: 100, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
     transition={{ duration: 1, delay: 0.5 }}
-    className="relative w-32 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group hover:scale-105 transition-transform duration-300"
+    className="relative w-44 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group hover:scale-105 transition-transform duration-300"
   >
     {/* Top Curve (Yellow) */}
     <div className="w-full h-24 bg-[#FFD700] rounded-t-full relative z-10 flex items-end justify-center pb-2 border-b border-black/10 overflow-hidden">
@@ -624,7 +628,7 @@ const Milestone = ({ distance = 0 }) => (
         <div className="absolute inset-0 bg-gradient-to-b from-gray-100/50 to-gray-300/30 pointer-events-none" />
         <div className="absolute bottom-0 w-full h-8 bg-gradient-to-t from-gray-900/10 to-transparent pointer-events-none" />
         
-        <span className="text-black font-extrabold text-2xl font-[--font-display] z-10">SALEM</span>
+        <span className="text-black font-extrabold text-lg md:text-xl font-[--font-display] z-10 px-2 text-center uppercase">TIRUCHENGODE</span>
         <div className="flex items-baseline gap-1 z-10 mt-1">
           <span className="text-black font-black text-4xl font-sans">{distance}</span>
           <span className="text-black/70 font-bold text-sm">km</span>

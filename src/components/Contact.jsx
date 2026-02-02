@@ -44,7 +44,8 @@ const Contact = () => {
                </div>
                <div>
                  <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Phone</div>
-                 <div className="font-bold text-white text-lg">+91 98765 43210</div>
+                 <div className="font-bold text-white text-lg">+91 8668167715</div>
+                 <div className="font-bold text-white text-lg mt-1">+91 8825635432</div>
                </div>
              </div>
 
@@ -54,7 +55,12 @@ const Contact = () => {
                </div>
                <div>
                  <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Location</div>
-                 <div className="font-bold text-white text-lg">Bangalore, India</div>
+                 <div className="font-bold text-white text-sm leading-relaxed">
+                   6/28, Kuttimaikanpattio<br/>
+                   Rajapalayam (post)<br/>
+                   Tiruchengode (Tk)<br/>
+                   Namakkal-637 209
+                 </div>
                </div>
              </div>
           </div>

@@ -11,7 +11,7 @@ const DriverDashboard = () => {
 
   const myStatus = drivers.find(d => d.id === user.id)?.status || 'online';
   // Default to "Salem" if location unknown, but ideally user.location has "Kondalampatti" etc.
-  const myLocation = user.location && user.location !== 'Unknown' ? user.location : 'Salem'; 
+  const myLocation = user.location && user.location !== 'Unknown' ? user.location : 'Tiruchengode'; 
 
   // Check proximity (Simple string match for MVP)
   const isNearby = (pickupLocation) => {

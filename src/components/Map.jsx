@@ -58,12 +58,12 @@ const geocodeAddress = async (address) => {
         return null;
     };
 
-    // 1. Try with strict "Salem, India" suffix
-    let coords = await fetchCoords(`${address}, Salem, India`);
+    // 1. Try with strict "Tiruchengode, India" suffix
+    let coords = await fetchCoords(`${address}, Tiruchengode, India`);
     if (coords) return coords;
 
-    // 2. Try with just "Salem" suffix (looser)
-    coords = await fetchCoords(`${address}, Salem`);
+    // 2. Try with just "Tiruchengode" suffix (looser)
+    coords = await fetchCoords(`${address}, Tiruchengode`);
     if (coords) return coords;
 
     // 3. Try exact address (rarely works but good fallback)
@@ -113,7 +113,7 @@ const BoundsUpdater = ({ markers }) => {
 };
 
 const Map = ({ 
-  center = [11.6643, 78.1460], // Default to Salem
+  center = [11.3802, 77.8944], // Default to Tiruchengode
   zoom = 13, 
   drivers = [],
   onLocationFound,
