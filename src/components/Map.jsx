@@ -364,7 +364,7 @@ const Map = ({
         )}
 
         {/* Mock Drivers */}
-        {drivers.map((driver) => (
+        {drivers.filter(d => d.position).map((driver) => (
             <Marker key={driver.id} position={driver.position} icon={DefaultIcon}>
                 <Popup>{driver.name} - {driver.vehicle}</Popup>
             </Marker>
