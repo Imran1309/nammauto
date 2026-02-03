@@ -16,12 +16,28 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
+// Helper to validate LatLng
+const isValidLatLng = (pos) => {
+    if (!pos) return false;
+    if (Array.isArray(pos)) {
+        return pos.length === 2 && typeof pos[0] === 'number' && typeof pos[1] === 'number' && !isNaN(pos[0]) && !isNaN(pos[1]);
+    }
+    if (typeof pos === 'object') {
+        return typeof pos.lat === 'number' && typeof pos.lng === 'number' && !isNaN(pos.lat) && !isNaN(pos.lng);
+    }
+    return false;
+};
+
 // Child component to update map center when props change
 const MapUpdater = ({ center }) => {
   const map = useMap();
   useEffect(() => {
-    if (center) {
-        map.setView(center, map.getZoom());
+    if (center && isValidLatLng(center)) {
+        try {
+            map.setView(center, map.getZoom());
+        } catch (e) {
+            console.warn("MapUpdater error:", e);
+        }
     }
   }, [center, map]);
   return null;
@@ -31,10 +47,10 @@ const MapUpdater = ({ center }) => {
 const FlyToLocation = ({ coords }) => {
     const map = useMap();
     useEffect(() => {
-        if (coords) {
-            map.flyTo(coords, 15, {
-                duration: 2
-            });
+        if (coords && isValidLatLng(coords)) {
+            try {
+                map.flyTo(coords, 15, { duration: 2 });
+            } catch (e) { console.warn("FlyTo error", e); }
         }
     }, [coords, map]);
     return null;
@@ -49,8 +65,10 @@ const geocodeAddress = async (address) => {
         try {
             const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
             const data = await response.json();
-            if (data && data.length > 0) {
-                return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+            if (data && data.length > 0 && data[0].lat && data[0].lon) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                if (!isNaN(lat) && !isNaN(lon)) return [lat, lon];
             }
         } catch (e) {
             console.error("Geocode error:", e);
@@ -78,7 +96,7 @@ const ResizeHandler = () => {
   const map = useMap();
   useEffect(() => {
     const timer = setTimeout(() => {
-        map.invalidateSize();
+        try { map.invalidateSize(); } catch(e){}
     }, 400); // Wait for animation to finish
     return () => clearTimeout(timer);
   }, [map]);
@@ -104,9 +122,12 @@ const reverseGeocode = async (lat, lon) => {
 const BoundsUpdater = ({ markers }) => {
     const map = useMap();
     useEffect(() => {
-        if (markers.length > 0) {
-            const group = new L.FeatureGroup(markers.map(pos => L.marker(pos)));
-            map.fitBounds(group.getBounds().pad(0.1));
+        const validMarkers = markers.filter(isValidLatLng);
+        if (validMarkers.length > 0) {
+            try {
+                const group = new L.FeatureGroup(validMarkers.map(pos => L.marker(pos)));
+                map.fitBounds(group.getBounds().pad(0.1));
+            } catch (e) { console.warn("Bounds error", e); }
         }
     }, [markers, map]);
     return null;
@@ -144,18 +165,18 @@ const Map = ({
          // Only geocode if it looks like a real address (longer than 3 chars)
          if (pickup && pickup.length > 3 && pickup !== "Current Location (GPS)") {
              const coords = await geocodeAddress(pickup);
-             if (coords) {
+             if (isValidLatLng(coords)) {
                  setPickupPos(coords);
              } else {
                  // Optional: toast.error("Pickup location not found");
              }
-         } else if (pickup === "Current Location (GPS)" && userLocation) {
+         } else if (pickup === "Current Location (GPS)" && isValidLatLng(userLocation)) {
              setPickupPos(userLocation);
          }
 
          if (drop && drop.length > 3) {
              const coords = await geocodeAddress(drop);
-             if (coords) {
+             if (isValidLatLng(coords)) {
                  setDropPos(coords);
              }
          }
@@ -170,16 +191,21 @@ const Map = ({
 
   // Calculate Distance and Line
   useEffect(() => {
-      if (pickupPos && dropPos) {
+      if (isValidLatLng(pickupPos) && isValidLatLng(dropPos)) {
           setRoutePolyline([pickupPos, dropPos]);
           
-          // Haversine Distance Calculation
+          // Haversine Distance Calculation (Safe unwrapping)
+          const lat1 = Array.isArray(pickupPos) ? pickupPos[0] : pickupPos.lat;
+          const lon1 = Array.isArray(pickupPos) ? pickupPos[1] : pickupPos.lng;
+          const lat2 = Array.isArray(dropPos) ? dropPos[0] : dropPos.lat;
+          const lon2 = Array.isArray(dropPos) ? dropPos[1] : dropPos.lng;
+
           const R = 6371; // Radius of the earth in km
-          const dLat = (dropPos[0] - pickupPos[0]) * (Math.PI/180);
-          const dLon = (dropPos[1] - pickupPos[1]) * (Math.PI/180); 
+          const dLat = (lat2 - lat1) * (Math.PI/180);
+          const dLon = (lon2 - lon1) * (Math.PI/180); 
           const a = 
             Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(pickupPos[0] * (Math.PI/180)) * Math.cos(dropPos[0] * (Math.PI/180)) * 
+            Math.cos(lat1 * (Math.PI/180)) * Math.cos(lat2 * (Math.PI/180)) * 
             Math.sin(dLon/2) * Math.sin(dLon/2); 
           const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
           const d = R * c; // Distance in km
@@ -279,12 +305,12 @@ const Map = ({
   };
 
   const currentLayer = getTileLayer();
-  const allMarkers = [pickupPos, dropPos].filter(Boolean);
+  const allMarkers = [pickupPos, dropPos].filter(isValidLatLng);
 
   return (
     <div className="w-full h-full rounded-3xl overflow-hidden border-2 border-[--app-primary]/30 shadow-[0_0_30px_rgba(0,255,0,0.2)] relative z-10 group bg-[#121212]">
       <MapContainer 
-        center={center} 
+        center={isValidLatLng(center) ? center : [11.3802, 77.8944]} 
         zoom={zoom} 
         scrollWheelZoom={false} 
         attributionControl={false}
@@ -301,13 +327,13 @@ const Map = ({
         <ZoomControl position="bottomright" /> {/* Move Zoom to Bottom Right */}
 
         <ResizeHandler />
-        {!userLocation && allMarkers.length === 0 && <MapUpdater center={center} />}
+        {!isValidLatLng(userLocation) && allMarkers.length === 0 && <MapUpdater center={center} />}
         {allMarkers.length > 0 && <BoundsUpdater markers={allMarkers} />}
         
         <FlyToLocation coords={userLocation} />
 
         {/* Route Line - Blue Dashed Line */}
-        {pickupPos && dropPos && (
+        {isValidLatLng(pickupPos) && isValidLatLng(dropPos) && (
              <React.Fragment>
                 <Polyline 
                     positions={[pickupPos, dropPos]} 
@@ -357,14 +383,14 @@ const Map = ({
         )}
 
         {/* User GPS Marker */}
-        {userLocation && (
+        {isValidLatLng(userLocation) && (
             <Marker position={userLocation} icon={userIcon} zIndexOffset={1000}>
                 <Popup>You are here</Popup>
             </Marker>
         )}
 
         {/* Mock Drivers */}
-        {drivers.filter(d => d.position).map((driver) => (
+        {drivers.filter(d => isValidLatLng(d.position)).map((driver) => (
             <Marker key={driver.id} position={driver.position} icon={DefaultIcon}>
                 <Popup>{driver.name} - {driver.vehicle}</Popup>
             </Marker>
@@ -396,7 +422,6 @@ const Map = ({
           </div>
       </div>
       
-      {/* Live Badge - Top Right */}
       {/* Geocoding Loading Indicator */}
       {isSearching && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1000] bg-black/80 px-4 py-2 rounded-full text-white font-bold text-xs flex items-center gap-2 shadow-lg">
